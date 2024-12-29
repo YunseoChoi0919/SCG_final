@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result page</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        @font-face {
+     font-family: 'DungGeunMo';
+     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
+     font-weight: normal;
+     font-style: normal;
+    }
+
+    @font-face {
+    font-family: 'Dongle-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108_2@1.0/Dongle-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+    body{
+        display: flex;
+        background-color: #0391fb;
+        justify-content: center;
+        flex-wrap: wrap;
+        
+
+
+    }
+
+    .header{
+        position:fixed;
+        padding-top:15px;
+        top:0;
+        background-color: transparent;
+        width: 100vw;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+
+    .result_con{
+
+        
+        /* border-radius: 10px; */
+        width: 70vw;
+        gap:20px;
+        /* height: 200px; */
+        margin-top: 30px;
+        /* box-shadow: 3px 3px 5px 2px rgba(0, 0, 0, 0.2); */
+        
+
+        display: flex;
+        flex-wrap: wrap;
+
+        justify-content: space-around;
+    }
+
+    .function1{
+        padding-left:100px;
+        padding-top:20px;
+    }
+
+    .function2{
+        padding-right:100px;
+        padding-top:20px;
+    }
+    .direction{
+        font-family: 'DungGeunMo';
+        color:white;
+        font-size: 16px;
+        text-align: center;
+        width:100%;
+    }
+    
+    .content{
+        margin-top:120px; 
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    
+
+    .bar_chart{
+        width:40%;
+        background-color: white;
+        border-radius: 10px;
+        height: auto;
+        /* margin-top: 80px; */
+        box-shadow: 3px 3px 5px 2px rgba(0, 0, 0, 0.2);
+        padding:20px;
+
+    }
+
+    .explain{
+        width:70%;
+        background-color: white;
+        border-radius: 10px;
+        height: auto;
+        /* margin-top: 80px; */
+        box-shadow: 3px 3px 5px 2px rgba(0, 0, 0, 0.2);
+        padding:20px;
+        font-family: 'Dongle-Regular';
+        font-size:25px;
+        font-weight:10s;
+        line-height: 1.2;
+        font-size: 30px;
+
+
+    }
+
+    .console_p{
+        font-size:20px;
+        color:#ffe561;
+        font-family: 'DungGeunMo';
+        background-color: transparent;
+        border-radius: 10px;
+        box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        box-sizing: border-box;
+        height:45px;
+        margin:auto;
+        width:50%;
+        text-align: center;
+    }
+
+    #messageBox{
+        margin-top: 20px;
+        font-size: 18px;
+        line-height: 1.8;
+        padding: 20px;
+        font-family: "DungGeunMo";
+        width: 100%;
+        background-color: white;
+        border-radius: 10px;
+        height: auto;
+        /* margin-top: 80px; */
+        box-shadow: 3px 3px 5px 2px rgba(0, 0, 0, 0.2);
+
+    }
+
+
+    .console_reult{
+        margin-top: 20px;
+        width: 100%;
+        display:flex;
+        flex-wrap: wrap;
+        gap:15px;
+    }
+
+    .console{
+        width:50%;
+    }
+
+    span{
+        font-family: 'DungGeunMo';
+        color:#0391fb;
+        font-size: 25px;
+        margin-bottom: 5px;
+        margin-top: 10px;
+    }
+
+    #red_{
+        color:red;
+ 
+    }
+
+    #green_{
+        color: green;
+    }
+
+    #blue_{
+        color: blue;
+    }
+
+    #yellow_{
+        color: #ffe561;
+    }
+
+
+
+    </style>
+</head>
+
+<div class="header">
+    <a href="https://quad-bike.webflow.io/"><img class="function1" src="./h.png" width="70px"></a>
+    <div class = "logo"> <a href = "https://quad-bike.webflow.io/"><img src = "./l.png" width=200px></a> </div>
+    <a href="https://quad-bike.webflow.io/team"><img class="function2"  src="./t.png"width="70px"></a>
+</div>
+
+<div class="content">
+
+    <p class="direction">시뮬레이션 결과를 확인하세요!</p>
+
+    <div class = "result_con">
+        <div class = "bar_chart">
+            <canvas id="myDonutChart" width="50" height="50"></canvas>
+        </div>
+        <div class = "console">
+            <p class = "console_p">시뮬레이션 콘솔</p>
+            <div id="messageBox"></div>
+            
+
+        </div>
+
+        <div class = "explain" id="explainBox">
+            <span>최종 해설</span> <br>
+            
+        </div>
+        
+    </div>
+
+</div>
+
+
+<script>
+
+    //// 통신
+
+        // 웹소켓 서버 주소
+    const socket = new WebSocket('wss://c189-34-106-28-88.ngrok-free.app');  // 여기에 실제 서버 주소를 입력하세요.
+
+    // 웹소켓이 열리면 실행되는 코드
+    socket.onopen = function(event) {
+      console.log('WebSocket 연결됨');
+
+      socket.send(JSON.stringify({action : 'log in'}));
+    };
+
+
+
+    // 서버로부터 메시지를 받으면 실행되는 코드
+    socket.onmessage = function(event) {
+      // 메시지를 div에 추가
+      const data = JSON.parse(event.data);
+    
+      const sp0_num = Number(data.sp0);  // { type: "coal", quantity: 100 }
+      const sp1_num = Number(data.sp1);  // { type: "coal", quantity: 100 }
+      const sp2_num = Number(data.sp2);  // { type: "coal", quantity: 100 }
+      const sp3_num = Number(data.sp3);  // { type: "coal", quantity: 100 }
+      const sp4_num = Number(data.sp4);  // { type: "coal", quantity: 100 }
+
+
+
+          ///시각화
+    const ctx = document.getElementById('myDonutChart').getContext('2d');
+
+// 데이터
+const data1 = {
+    labels: ['인간', '고양이, 곰', '소,양,사슴', '조개', '어류'], // 동물 이름
+    datasets: [{
+        data: [sp0_num, sp1_num, sp2_num, sp3_num, sp4_num], // 각 동물에 해당하는 숫자
+        backgroundColor: ["#808080", "#FF4D4D", "#66FF66", "#FFFF33", "#33FFFF"], // 색상 설정
+        hoverBackgroundColor: ["#555555", "#B32D2D", "#339933", "#B3B300", "#009999"], // hover시 색상
+    }]
+};
+
+// 도넛 차트 생성
+const config = {
+    type: 'doughnut',
+    data: data1,
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(tooltipItem) {
+                        return tooltipItem.label + ': ' + tooltipItem.raw;
+                    }
+                }
+            }
+        }
+    }
+};
+
+// 차트 렌더링
+const myDonutChart = new Chart(ctx, config);
+
+const consoleData = data.console; // { status: "running", logs: ["log1", "log2"] }
+const quotedString = consoleData.map(item => `[${item}]`).join("<br>");
+
+const sp_list = [sp0_num, sp1_num, sp2_num, sp3_num, sp4_num];
+
+let max_value = Math.max(...sp_list);
+
+        // 최댓값이 원래 배열에서 어떤 인덱스에 있는지 찾기
+let max_index = sp_list.indexOf(max_value);
+let tester = false;
+
+        // 만약 sp0_num이 최댓값이라면 그것을 제외한 최댓값을 찾기
+if (max_value === sp0_num) {
+    // sp0_num을 제외한 배열 만들기
+    const sp_list_without_sp0 = sp_list.filter(num => num !== sp0_num);
+    tester = true;
+    // 새로운 최댓값을 찾고 그 인덱스를 구하기
+    max_value = Math.max(...sp_list_without_sp0);
+    max_index = sp_list.indexOf(max_value); // 기존 배열에서 새로운 최댓값의 인덱스를 찾기
+}
+
+        let = explainString = ""
+
+        if (tester){
+            if(max_index==1){
+
+                explainString = "<span id = 'red_'>Carnivora</span>(고양이, 곰)는 육식동물의 한 과로 개과, 고양이과, 곰과, 수달과, 하이에나과, 맹금과 등의 동물들을 포함합니다. 이 종이 인간 다음으로 화석이 많이 생성되었습니다. 생성된 화석에는 인간과 많은 교류가 일어났던 개와 고양이 화석이 많습니다. 반면 수달과, 하이에나과, 맹금과의 화석은 현저히 적습니다. "
+            }
+
+            if(max_index==2){
+                explainString = "<span id = 'green_'>Cetartiodactyla</span>(소, 양, 사슴)는 포유동물인 고래목과 우제목을 포함합니다. 여기서는 소과, 사슴과, 기린과, 멧돼지과, 하마과, 낙타과가 포함된 우제목을 가르키는 개념으로 사용되었습니다. 이 종이 인간 다음으로 화석이 많이 생성되었습니다. 생성된 화석에는 인간이 사육했던 소, 염소, 돼지의  화석이 많습니다. 반면 기린과 하마, 낙타의 화석은 현저히 적습니다. "
+            }
+
+            if(max_index==3){
+                explainString = "<span id = 'yellow_'>Bivalvia</span>(조개)는 굴류, 홍합휴, 조개류, 가리비류, 참굴류, 진주조개류, 민물조개류 등을 포함합니다. 이 종이 인간 다음으로 화석이 많이 생성되었습니다. 생성된 화석에는 양식업에 사용되었던 가리비류가 많습니다. Bivalvia는 다른 종보다 인간에 의한 서식지 오염(산호초 파괴 등)및 댐 간척 등의 영향을 크게 받습니다. "
+            }
+
+            if(max_index==4){
+                explainString = "<span id = 'blue_'>Actinopterygii</span>(어류)는 청어류, 연어류 등을 포함하는 경골어류의 한 종류입니다. 이 종이 인간 다음으로 화석이 많이 생성되었습니다. 생성된 화석에는 인간의 소비량이 많은 고등어와 잉어가 많습니다. 그러나 서식지 파괴, 인간에 의한 남획으로 인해 멸치상어, 철갑상어 등의 화석은 현저히 낮습니다."
+            }
+
+        }else{
+            explainString = "각 생물종들은 자연의 섭리에 맞추어 자유롭게 경쟁하면서 살아갑니다."
+        }
+
+
+
+        const explainBox = document.getElementById('explainBox');
+        explainBox.innerHTML += '<p>' + explainString + '</p>';
+
+
+
+      const messageBox = document.getElementById('messageBox');
+      messageBox.innerHTML += '<p>' + quotedString + '</p>';
+      messageBox.scrollTop = messageBox.scrollHeight;  // 새로운 메시지가 추가되면 자동으로 스크롤을 맨 아래로 내림
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    };
+
+    // 웹소켓에 에러가 발생하면 실행되는 코드
+    socket.onerror = function(error) {
+      console.log('웹소켓 오류:', error);
+    };
+
+    // 웹소켓 연결이 종료되면 실행되는 코드
+    socket.onclose = function(event) {
+      console.log('웹소켓 연결 종료됨');
+    };
+
+
+
+</script>
+
+<body>
+    
+</body>
+</html>
