@@ -7,3 +7,5 @@
 
 웹의 실제 작동방식을 나타내는 영상입니다. 
 
+<img src="https://github.com/user-attachments/assets/724019b0-2ddf-4af3-a0aa-f94deb15d025">
+
