@@ -6,5 +6,5 @@
 
 웹의 실제 작동방식을 나타내는 영상입니다. 
 
-<img src="https://github.com/user-attachments/assets/7788e6f1-152b-4690-950d-6a6e85bef357" width = 1200px>
+<img src="https://github.com/user-attachments/assets/7788e6f1-152b-4690-950d-6a6e85bef357" width = 800px>
 
